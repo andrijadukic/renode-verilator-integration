@@ -35,29 +35,39 @@ void eval() {
 RenodeAgent *Init() {
     Dbbif *bus = new Dbbif();
 
-    //=================================================
-    // Init CFU signals
-    //=================================================
-    bus->req_valid = &top->cmd_valid;
-    bus->req_ready = &top->cmd_ready;
-    bus->req_func_id = (uint16_t * ) & top->cmd_payload_function_id;
-    bus->req_data0 = (uint32_t * ) & top->cmd_payload_inputs_0;
-    bus->req_data1 = (uint32_t * ) & top->cmd_payload_inputs_1;
-    bus->resp_valid = &top->rsp_valid;
-    bus->resp_ready = &top->rsp_ready;
-    bus->resp_ok = &top->rsp_payload_response_ok;
-    bus->resp_data = (uint32_t * ) & top->rsp_payload_outputs_0;
-    bus->rst = &top->reset;
-    bus->clk = &top->clk;
+    bus->aclk = &top->clk;
+    bus->aresetn = &top->rst;
 
-    //=================================================
-    // Init eval function
-    //=================================================
+    bus->awvalid = &top->awvalid;
+    bus->awready = &top->awready;
+    bus->awaddr = (uint64_t *) &top->awaddr;
+    bus->awlen = &top->awlen;
+    bus->awid = &top->awid;
+
+    bus->wvalid = &top->wvalid;
+    bus->wready = &top->wready;
+    bus->wdata = &top->wdata;
+    bus->wlast = &top->wlast;
+    bus->wstrb = &top->wstrb;
+
+    bus->bvalid = &top->bvalid;
+    bus->bready = &top->bready;
+    bus->bid = &top->bid;
+
+    bus->arvalid = &top->arvalid;
+    bus->arready = &top->arready;
+    bus->araddr = (uint64_t *) &top->araddr;
+    bus->arlen = &top->arlen;
+    bus->arid = &top->arid;
+
+    bus->rvalid = &top->rvalid;
+    bus->rready = &top->rready;
+    bus->rlast = &top->rlast;
+    bus->rdata = &top->rdata;
+    bus->rid = &top->rid;
+
     bus->evaluateModel = &eval;
 
-    //=================================================
-    // Init peripheral
-    //=================================================
     nvdla = new RenodeAgent(bus);
 
 #if VM_TRACE
