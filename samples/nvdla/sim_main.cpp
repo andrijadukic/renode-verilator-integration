@@ -19,7 +19,7 @@
 #include "src/buses/nvdla-slave.h"
 
 RenodeAgent *nvdla;
-Vcfu *top = new VNvdla;
+VNvdla *top = new VNvdla;
 VerilatedVcdC *tfp;
 vluint64_t main_time = 0;
 
