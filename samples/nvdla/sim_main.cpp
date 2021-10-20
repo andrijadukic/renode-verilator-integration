@@ -33,38 +33,38 @@ void eval() {
 }
 
 RenodeAgent *Init() {
-    Dbbif *bus = new Dbbif();
+    Dbbif *bus = new DbbifSlave();
 
     bus->aclk = &top->clk;
     bus->aresetn = &top->rst;
 
-    bus->awvalid = &top->awvalid;
-    bus->awready = &top->awready;
-    bus->awaddr = (uint64_t *) &top->awaddr;
-    bus->awlen = &top->awlen;
-    bus->awid = &top->awid;
+    bus->awvalid = &top->nvdla_core2dbb_aw_awvalid;
+    bus->awready = &top->nvdla_core2dbb_aw_awready;
+    bus->awaddr = (uint64_t *) &top->nvdla_core2dbb_aw_awaddr;
+    bus->awlen = &top->nvdla_core2dbb_aw_awlen;
+    bus->awid = &top->nvdla_core2dbb_aw_awid;
 
-    bus->wvalid = &top->wvalid;
-    bus->wready = &top->wready;
-    bus->wdata = &top->wdata;
-    bus->wlast = &top->wlast;
-    bus->wstrb = &top->wstrb;
+    bus->wvalid = &top->nvdla_core2dbb_w_wvalid;
+    bus->wready = &top->nvdla_core2dbb_w_wready;
+    bus->wdata = &top->nvdla_core2dbb_w_wdata;
+    bus->wlast = &top->nvdla_core2dbb_w_wlast;
+    bus->wstrb = &top->nvdla_core2dbb_w_wstrb;
 
-    bus->bvalid = &top->bvalid;
-    bus->bready = &top->bready;
-    bus->bid = &top->bid;
+    bus->bvalid = &top->nvdla_core2dbb_b_bvalid;
+    bus->bready = &top->nvdla_core2dbb_b_bready;
+    bus->bid = &top->nvdla_core2dbb_b_bid;
 
-    bus->arvalid = &top->arvalid;
-    bus->arready = &top->arready;
-    bus->araddr = (uint64_t *) &top->araddr;
-    bus->arlen = &top->arlen;
-    bus->arid = &top->arid;
+    bus->arvalid = &top->nvdla_core2dbb_ar_arvalid;
+    bus->arready = &top->nvdla_core2dbb_ar_arready;
+    bus->araddr = (uint64_t *) &top->nvdla_core2dbb_ar_araddr;
+    bus->arlen = &top->nvdla_core2dbb_ar_arlen;
+    bus->arid = &top->nvdla_core2dbb_ar_arid;
 
-    bus->rvalid = &top->rvalid;
-    bus->rready = &top->rready;
-    bus->rlast = &top->rlast;
-    bus->rdata = &top->rdata;
-    bus->rid = &top->rid;
+    bus->rvalid = &top->nvdla_core2dbb_r_rvalid;
+    bus->rready = &top->nvdla_core2dbb_r_rready;
+    bus->rlast = &top->nvdla_core2dbb_r_rlast;
+    bus->rdata = &top->nvdla_core2dbb_r_rdata;
+    bus->rid = &top->nvdla_core2dbb_r_rid;
 
     bus->evaluateModel = &eval;
 
