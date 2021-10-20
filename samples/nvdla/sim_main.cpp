@@ -5,7 +5,7 @@
 //  Full license text is available in 'LICENSE' file.
 //
 #include <verilated.h>
-#include "VNvdla.h"
+#include "VNV_nvdla.h"
 #include <bitset>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,11 +15,11 @@
 # include <verilated_vcd_c.h>
 #endif
 
-#include "src/renode_cfu.h"
-#include "src/buses/nvdla-slave.h"
+#include "src/renode.h"
+#include "src/buses/dbbif-slave.h"
 
 RenodeAgent *nvdla;
-VNvdla *top = new VNvdla;
+VNV_nvdla *top = new VNV_nvdla;
 VerilatedVcdC *tfp;
 vluint64_t main_time = 0;
 
@@ -33,10 +33,12 @@ void eval() {
 }
 
 RenodeAgent *Init() {
-    Dbbif *bus = new DbbifSlave();
+    top->direct_reset_ = 1;
 
-    bus->aclk = &top->clk;
-    bus->aresetn = &top->rst;
+    Dbbif *bus = new DbbifSlave(64, 64);
+
+    bus->aclk = &top->dla_core_clk;
+    bus->aresetn = &top->dla_reset_rstn;
 
     bus->awvalid = &top->nvdla_core2dbb_aw_awvalid;
     bus->awready = &top->nvdla_core2dbb_aw_awready;
