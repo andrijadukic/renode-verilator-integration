@@ -17,6 +17,7 @@
 
 #include "src/renode.h"
 #include "src/buses/dbbif-slave.h"
+#include "src/buses/csb.h"
 
 RenodeAgent *nvdla;
 VNV_nvdla *top = new VNV_nvdla;
@@ -35,42 +36,61 @@ void eval() {
 RenodeAgent *Init() {
     top->direct_reset_ = 1;
 
-    Dbbif *bus = new DbbifSlave(64, 64);
+    Dbbif *dbbif = new DbbifSlave(64, 64);
 
-    bus->aclk = &top->dla_core_clk;
-    bus->aresetn = &top->dla_reset_rstn;
+    dbbif->aclk = &top->dla_core_clk;
+    dbbif->aresetn = &top->dla_reset_rstn;
 
-    bus->awvalid = &top->nvdla_core2dbb_aw_awvalid;
-    bus->awready = &top->nvdla_core2dbb_aw_awready;
-    bus->awaddr = (uint64_t *) &top->nvdla_core2dbb_aw_awaddr;
-    bus->awlen = &top->nvdla_core2dbb_aw_awlen;
-    bus->awid = &top->nvdla_core2dbb_aw_awid;
+    dbbif->awvalid = &top->nvdla_core2dbb_aw_awvalid;
+    dbbif->awready = &top->nvdla_core2dbb_aw_awready;
+    dbbif->awaddr = (uint64_t * ) & top->nvdla_core2dbb_aw_awaddr;
+    dbbif->awlen = &top->nvdla_core2dbb_aw_awlen;
+    dbbif->awid = &top->nvdla_core2dbb_aw_awid;
 
-    bus->wvalid = &top->nvdla_core2dbb_w_wvalid;
-    bus->wready = &top->nvdla_core2dbb_w_wready;
-    bus->wdata = &top->nvdla_core2dbb_w_wdata;
-    bus->wlast = &top->nvdla_core2dbb_w_wlast;
-    bus->wstrb = &top->nvdla_core2dbb_w_wstrb;
+    dbbif->wvalid = &top->nvdla_core2dbb_w_wvalid;
+    dbbif->wready = &top->nvdla_core2dbb_w_wready;
+    dbbif->wdata = &top->nvdla_core2dbb_w_wdata;
+    dbbif->wlast = &top->nvdla_core2dbb_w_wlast;
+    dbbif->wstrb = &top->nvdla_core2dbb_w_wstrb;
 
-    bus->bvalid = &top->nvdla_core2dbb_b_bvalid;
-    bus->bready = &top->nvdla_core2dbb_b_bready;
-    bus->bid = &top->nvdla_core2dbb_b_bid;
+    dbbif->bvalid = &top->nvdla_core2dbb_b_bvalid;
+    dbbif->bready = &top->nvdla_core2dbb_b_bready;
+    dbbif->bid = &top->nvdla_core2dbb_b_bid;
 
-    bus->arvalid = &top->nvdla_core2dbb_ar_arvalid;
-    bus->arready = &top->nvdla_core2dbb_ar_arready;
-    bus->araddr = (uint64_t *) &top->nvdla_core2dbb_ar_araddr;
-    bus->arlen = &top->nvdla_core2dbb_ar_arlen;
-    bus->arid = &top->nvdla_core2dbb_ar_arid;
+    dbbif->arvalid = &top->nvdla_core2dbb_ar_arvalid;
+    dbbif->arready = &top->nvdla_core2dbb_ar_arready;
+    dbbif->araddr = (uint64_t * ) & top->nvdla_core2dbb_ar_araddr;
+    dbbif->arlen = &top->nvdla_core2dbb_ar_arlen;
+    dbbif->arid = &top->nvdla_core2dbb_ar_arid;
 
-    bus->rvalid = &top->nvdla_core2dbb_r_rvalid;
-    bus->rready = &top->nvdla_core2dbb_r_rready;
-    bus->rlast = &top->nvdla_core2dbb_r_rlast;
-    bus->rdata = &top->nvdla_core2dbb_r_rdata;
-    bus->rid = &top->nvdla_core2dbb_r_rid;
+    dbbif->rvalid = &top->nvdla_core2dbb_r_rvalid;
+    dbbif->rready = &top->nvdla_core2dbb_r_rready;
+    dbbif->rlast = &top->nvdla_core2dbb_r_rlast;
+    dbbif->rdata = &top->nvdla_core2dbb_r_rdata;
+    dbbif->rid = &top->nvdla_core2dbb_r_rid;
 
-    bus->evaluateModel = &eval;
+    dbbif->evaluateModel = &eval;
 
-    nvdla = new RenodeAgent(bus);
+    CSB *csb = new CSB();
+
+    csb->csb_clock = &top->dla_core_clk;
+
+    csb->csb_valid = &top->csb2nvdla_valid;
+    csb->csb_ready = &top->csb2nvdla_ready;
+    csb->csb_addr = &top->csb2nvdla_addr;
+    csb->csb_wdat = &top->csb2nvdla_wdat;
+    csb->csb_write = &top->csb2nvdla_write;
+    csb->csb_nposted = &top->csb2nvdla_nposted;
+
+    csb->csb_r_valid = &top->nvdla2csb_valid;
+    csb->csb_r_data = &top->nvdla2csb_data;
+
+    csb->csb_wr_complete = &top->nvdla2csb_wr_complete;
+
+    csb->evaluateModel = &eval;
+
+    nvdla = new RenodeAgent(dbbif);
+    nvdla.addBus(csb)
 
 #if VM_TRACE
     Verilated::traceEverOn(true);
