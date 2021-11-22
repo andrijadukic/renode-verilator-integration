@@ -90,7 +90,7 @@ RenodeAgent *Init() {
     csb->evaluateModel = &eval;
 
     nvdla = new RenodeAgent(dbbif);
-    nvdla.addBus(csb)
+    nvdla->addBus(csb);
 
 #if VM_TRACE
     Verilated::traceEverOn(true);
@@ -100,4 +100,20 @@ RenodeAgent *Init() {
 #endif
 
     return nvdla;
+}
+
+int main(int argc, char **argv, char **env) {
+    if(argc < 3) {
+        printf("Usage: %s {receiverPort} {senderPort} [{address}]\n", argv[0]);
+        exit(-1);
+    }
+    const char *address = argc < 4 ? "127.0.0.1" : argv[3];
+
+    Verilated::commandArgs(argc, argv);
+
+    Init();
+    nvdla->reset();
+    nvdla->simulate(atoi(argv[1]), atoi(argv[2]), address);
+    top->final();
+    exit(0);
 }
